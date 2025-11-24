@@ -18,20 +18,26 @@ export function hideMembersOnlyVideos() {
     videoItems.forEach(item => {
         let shouldHide = false;
 
-        // Look for the "Members only" badge in current format
+        // "Members only" badge for most videos (new format)
+        const oldMembersBadge = item.querySelector('.yt-badge-shape--membership');
+        if (oldMembersBadge) {
+            shouldHide = true;
+        }
+
+        // "Members only" for most videos (old format)
         const membersBadge = item.querySelector('.badge-style-type-members-only');
         if (membersBadge) {
             shouldHide = true;
         }
 
-        // Look for the "Members only" badge in recommended videos format (yt-lockup-view-model)
-        const commerceBadge = item.querySelector('.yt-badge-shape--commerce');
-        if (commerceBadge) {
+        // "Members only" for related videos
+        const relatedMembersBadge = item.querySelector('.yt-badge-shape--commerce');
+        if (relatedMembersBadge) {
             shouldHide = true;
         }
 
         if (shouldHide) {
-            // For recommended videos (yt-lockup-view-model), hide the element directly
+            // For related videos (yt-lockup-view-model), hide the element directly
             // For grid videos, hide the parent grid item to avoid breaking layout
             let target: HTMLElement;
             if (item.tagName.toLowerCase() === 'yt-lockup-view-model') {
@@ -48,8 +54,7 @@ export function hideMembersOnlyVideos() {
         }
     });
 
-    // Log how many videos were hidden (for debugging)
     if (hiddenCount > 0) {
-        memberVideosLog(`Hidden ${hiddenCount} members-only videos`);
+        memberVideosLog(`Hidden ${hiddenCount} members-only videos from DOM.`);
     }
 }
