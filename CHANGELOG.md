@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.4] - 2025-11-24
+
+### Fix
+- Add support for new "Members only" badge selector
+
 ## [1.3.3] - 2025-10-21
 - Changed extension name in Popup
 
@@ -46,7 +51,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[Unreleased]: https://github.com/YouG-o/Hide_YouTube_Members-Only/compare/v1.3.3...HEAD
+[Unreleased]: https://github.com/YouG-o/Hide_YouTube_Members-Only/compare/v1.3.4...HEAD
+[1.3.4]: https://github.com/YouG-o/Hide_YouTube_Members-Only/compare/v1.3.3...v1.3.4
 [1.3.3]: https://github.com/YouG-o/Hide_YouTube_Members-Only/compare/v1.3.1...v1.3.3
 [1.3.1]: https://github.com/YouG-o/Hide_YouTube_Members-Only/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/YouG-o/Hide_YouTube_Members-Only/compare/v1.2.0...v1.3.0
