@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.5] - 2026-01-08
+
+### Fix
+- Hide parent ytd-rich-item-renderer on the homepage to prevent empty grid slots when members-only videos are hidden.
+
 ## [1.3.4] - 2025-11-24
 
 ### Fix
@@ -51,7 +56,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[Unreleased]: https://github.com/YouG-o/Hide_YouTube_Members-Only/compare/v1.3.4...HEAD
+[Unreleased]: https://github.com/YouG-o/Hide_YouTube_Members-Only/compare/v1.3.5...HEAD
+[1.3.5]: https://github.com/YouG-o/Hide_YouTube_Members-Only/compare/v1.3.4...v1.3.5
 [1.3.4]: https://github.com/YouG-o/Hide_YouTube_Members-Only/compare/v1.3.3...v1.3.4
 [1.3.3]: https://github.com/YouG-o/Hide_YouTube_Members-Only/compare/v1.3.1...v1.3.3
 [1.3.1]: https://github.com/YouG-o/Hide_YouTube_Members-Only/compare/v1.3.0...v1.3.1
