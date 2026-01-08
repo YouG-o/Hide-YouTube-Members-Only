@@ -12,8 +12,11 @@ import { memberVideosLog } from "../../utils/logger";
 // List of YouTube endpoints to intercept
 const fetchEndpoints = [
     '/youtubei/v1/search',
-    '/youtubei/v1/browse'
+    '/youtubei/v1/browse',
 ];
+
+// Counter for removed sponsorship videos in the current fetch response
+let removedCount = 0;
 
 // Helper function to detect sponsorship badge
 function isSponsorshipVideo(videoRenderer: any): boolean {
@@ -33,15 +36,15 @@ function getVideoTitle(videoRenderer: any): string {
     return '[Unknown Title]';
 }
 
-// Counter for filtered videos
-let filteredCount = 0;
-
 // Recursive filter function: remove richItemRenderer containing sponsorship video
 function filterSponsorshipVideos(obj: any): any {
     if (!obj || typeof obj !== 'object') return obj;
 
     if (Array.isArray(obj)) {
-        return obj.filter(item => {
+        const filtered: any[] = [];
+        for (const item of obj) {
+            let remove = false;
+
             // Check for richItemRenderer > content > videoRenderer
             if (
                 item &&
@@ -50,20 +53,27 @@ function filterSponsorshipVideos(obj: any): any {
                 item.richItemRenderer.content.videoRenderer &&
                 isSponsorshipVideo(item.richItemRenderer.content.videoRenderer)
             ) {
-                filteredCount++;
-                return false;
+                const videoRenderer = item.richItemRenderer.content.videoRenderer;
+                const title = getVideoTitle(videoRenderer);
+                //memberVideosLog(`Removed members-only video: "%c${title}%c"`, 'color: white;', '');
+                removedCount++;
+                remove = true;
             }
+
             // Check for direct videoRenderer (for other layouts)
-            if (
-                item &&
-                item.videoRenderer &&
-                isSponsorshipVideo(item.videoRenderer)
-            ) {
-                filteredCount++;
-                return false;
+            if (!remove && item && item.videoRenderer && isSponsorshipVideo(item.videoRenderer)) {
+                const videoRenderer = item.videoRenderer;
+                const title = getVideoTitle(videoRenderer);
+                //memberVideosLog(`Removed members-only video: "%c${title}%c"`, 'color: white;', '');
+                removedCount++;
+                remove = true;
             }
-            return true;
-        }).map(filterSponsorshipVideos);
+
+            if (!remove) {
+                filtered.push(filterSponsorshipVideos(item));
+            }
+        }
+        return filtered;
     }
 
     // Recursively process all properties
@@ -90,13 +100,17 @@ window.fetch = function(input: RequestInfo | URL, init?: RequestInit): Promise<R
     }
 
     if (fetchEndpoints.some(endpoint => url.includes(endpoint))) {
-        filteredCount = 0; // Reset counter for each request
         return originalFetch(input, init).then(response => {
             return response.clone().json().then(data => {
+                // Reset counter for this response and run filter
+                removedCount = 0;
                 const filteredData = filterSponsorshipVideos(data);
-                if (filteredCount > 0) {
-                    memberVideosLog(`[HYM] Hidden ${filteredCount} members-only videos from API response`);
+
+                // Log total removed in this fetch response, like the DOM method does
+                if (removedCount > 0) {
+                    memberVideosLog(`Removed ${removedCount} members-only videos (Response-Interceptor method).`);
                 }
+
                 return new Response(JSON.stringify(filteredData), {
                     status: response.status,
                     statusText: response.statusText,
@@ -108,4 +122,4 @@ window.fetch = function(input: RequestInfo | URL, init?: RequestInit): Promise<R
     return originalFetch(input, init);
 };
 
-memberVideosLog('[HYM] Sponsorship video fetch interceptor installed');
+memberVideosLog('Sponsorship video fetch interceptor installed');

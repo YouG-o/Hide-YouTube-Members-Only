@@ -37,16 +37,20 @@ export function hideMembersOnlyVideos() {
         }
 
         if (shouldHide) {
-            // For related videos (yt-lockup-view-model), hide the element directly
-            // For grid videos, hide the parent grid item to avoid breaking layout
+            // Determine the best element to hide to avoid leaving empty slots in grids.
+            // Keep existing behavior, but handle home rich-grid case where yt-lockup-view-model
+            // is nested inside ytd-rich-item-renderer which reserves layout space.
             let target: HTMLElement;
+
             if (item.tagName.toLowerCase() === 'yt-lockup-view-model') {
-                target = item as HTMLElement;
+                const richItemRenderer = item.closest('ytd-rich-item-renderer') as HTMLElement | null;
+                target = richItemRenderer ?? (item as HTMLElement);
             } else {
+                // For grid videos, hide the parent grid item to avoid breaking layout
                 const parentItem = item.closest('ytd-rich-item-renderer');
-                target = parentItem ? parentItem as HTMLElement : item as HTMLElement;
+                target = parentItem ? (parentItem as HTMLElement) : (item as HTMLElement);
             }
-            
+
             if (target.style.display !== 'none') {
                 target.style.display = 'none';
                 hiddenCount++;
@@ -55,6 +59,6 @@ export function hideMembersOnlyVideos() {
     });
 
     if (hiddenCount > 0) {
-        memberVideosLog(`Hidden ${hiddenCount} members-only videos from DOM.`);
+        memberVideosLog(`Hidden ${hiddenCount} members-only videos (DOM Method).`);
     }
 }
