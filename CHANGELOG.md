@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.6] - 2026-02-17
+
+### Fixed
+- Avoid hiding fundraiser/commerce videos: `.yt-badge-shape--commerce` handling is commented out in src/content/memberVideos/MemberVideos.ts to prevent false positives when detecting "members-only" videos in related/grid lists. Added TODO to implement a safer detection for members-only items in the related section.
+
 ## [1.3.5] - 2026-01-08
 
 ### Fix
@@ -56,7 +61,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[Unreleased]: https://github.com/YouG-o/Hide_YouTube_Members-Only/compare/v1.3.5...HEAD
+[Unreleased]: https://github.com/YouG-o/Hide_YouTube_Members-Only/compare/v1.3.6...HEAD
+[1.3.6]: https://github.com/YouG-o/Hide_YouTube_Members-Only/compare/v1.3.5...v1.3.6
 [1.3.5]: https://github.com/YouG-o/Hide_YouTube_Members-Only/compare/v1.3.4...v1.3.5
 [1.3.4]: https://github.com/YouG-o/Hide_YouTube_Members-Only/compare/v1.3.3...v1.3.4
 [1.3.3]: https://github.com/YouG-o/Hide_YouTube_Members-Only/compare/v1.3.1...v1.3.3

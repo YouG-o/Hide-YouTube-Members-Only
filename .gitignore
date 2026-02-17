@@ -41,3 +41,6 @@ web-ext-artifacts/
 # Reviewer source package for Mozilla
 reviewer-source*.zip
 /reviewer-source
+
+# GitHub Copilot instructions
+.github/copilot-instructions.md
