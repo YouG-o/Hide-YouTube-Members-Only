@@ -31,14 +31,13 @@ export function hideMembersOnlyVideos() {
         }
 
         // "Members only" for related videos
-        // Disabled because `.yt-badge-shape--commerce` is used for fundraisers/commerce badges
-        // and caused false positives by hiding "fund raising" videos.
-        // TODO: find an alternative way to detect/hide members-only videos in the related
-        //       section that does not match fundraiser/commerce badges. (if they still show up)
-        // const relatedMembersBadge = item.querySelector('.yt-badge-shape--commerce');
-        // if (relatedMembersBadge) {
-        //     shouldHide = true;
-        // }
+        // only when the commerce badge contains an icon. Fundraiser badges
+        // usually contain only text (no `.yt-badge-shape__icon`), so this shoud be
+        // language-independent and avoids hiding fundraisers.
+        const relatedMembersBadgeIcon = item.querySelector('.yt-badge-shape--commerce .yt-badge-shape__icon');
+        if (relatedMembersBadgeIcon) {
+            shouldHide = true;
+        }
 
         if (shouldHide) {
             // Determine the best element to hide to avoid leaving empty slots in grids.
