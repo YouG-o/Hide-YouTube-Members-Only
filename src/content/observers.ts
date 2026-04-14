@@ -107,7 +107,7 @@ function suggestedVidsObserver() {
         const itemSection = contents.querySelector('ytd-item-section-renderer');
         const targetElement = itemSection ? itemSection : contents;
         
-        coreLog(`Observing: ${targetElement === contents ? '#items directly' : 'ytd-item-section-renderer inside #items'}`);
+        //coreLog(`Observing: ${targetElement === contents ? '#items directly' : 'ytd-item-section-renderer inside #items'}`);
         
         suggestedVideosObserver = new MutationObserver(() => {
             if (suggestedVideosDebounceTimer !== null) {

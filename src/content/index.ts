@@ -11,6 +11,7 @@ import { coreLog, coreErrorLog, memberVideosErrorLog, memberVideosLog } from '..
 import { loadExtensionSettings } from '../utils/settings';
 import { ExtensionSettings } from '../types/types';
 import { setupUrlObserver, setupVisibilityChangeListener } from './observers';
+import { isIrrelevantIframe } from '../utils/navigation';
 
 
 coreLog('Content script starting to load...');
@@ -28,6 +29,12 @@ function injectFetchInterceptor() {
 // Initialize features based on settings
 async function initializeFeatures() {
     currentSettings = await loadExtensionSettings();
+
+    // Prevent initializing in irrelevant iframes (live chat, background auth pages, etc.)
+    // We only allow top-level windows
+    if (isIrrelevantIframe()) {
+        return;
+    }
     
     if(currentSettings?.hideMembersOnlyVideos.enabled){
         injectFetchInterceptor();

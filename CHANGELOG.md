@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-04-14
+
+### Fixed
+Update detection logic for new YouTube HTML structure
+
+### Refactor
+Refactor the video hiding logic to be more robust against YouTube's frequent UI updates and component changes.
+Do not run exension in irrelevant iframes.
+
 ## [1.3.7] - 2026-02-20
 
 ### Fixed
@@ -67,7 +76,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[Unreleased]: https://github.com/YouG-o/Hide_YouTube_Members-Only/compare/v1.3.7...HEAD
+[Unreleased]: https://github.com/YouG-o/Hide_YouTube_Members-Only/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/YouG-o/Hide_YouTube_Members-Only/compare/v1.3.7...v1.4.0
 [1.3.7]: https://github.com/YouG-o/Hide_YouTube_Members-Only/compare/v1.3.6...v1.3.7
 [1.3.6]: https://github.com/YouG-o/Hide_YouTube_Members-Only/compare/v1.3.5...v1.3.6
 [1.3.5]: https://github.com/YouG-o/Hide_YouTube_Members-Only/compare/v1.3.4...v1.3.5

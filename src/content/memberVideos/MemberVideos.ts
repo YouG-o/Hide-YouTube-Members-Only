@@ -11,48 +11,33 @@ import { memberVideosLog, memberVideosErrorLog } from "../../utils/logger";
 
 
 export function hideMembersOnlyVideos() {
-    // Select all video grid items and recommended videos
-    const videoItems = document.querySelectorAll('ytd-rich-grid-media, ytd-video-renderer, yt-lockup-view-model');
+    // Select all known membership badge variants.
+    // Including new PascalCase classes found in yt-lockup-view-model.
+    const badges = document.querySelectorAll(`
+        .ytBadgeShapeMembership, 
+        .yt-badge-shape--membership, 
+        .badge-style-type-members-only, 
+        .yt-badge-shape--commerce .yt-badge-shape__icon,
+        .ytBadgeShapeCommerce .ytBadgeShapeIcon
+    `);
+    
     let hiddenCount = 0;
 
-    videoItems.forEach(item => {
-        let shouldHide = false;
+    badges.forEach(badge => {
+        // Find the closest video component.
+        const container = badge.closest(`
+            ytd-video-renderer, 
+            ytd-compact-video-renderer, 
+            yt-lockup-view-model, 
+            ytd-grid-video-renderer,
+            ytd-rich-grid-media
+        `) as HTMLElement | null;
 
-        // "Members only" badge for most videos (new format)
-        const oldMembersBadge = item.querySelector('.yt-badge-shape--membership');
-        if (oldMembersBadge) {
-            shouldHide = true;
-        }
-
-        // "Members only" for most videos (old format)
-        const membersBadge = item.querySelector('.badge-style-type-members-only');
-        if (membersBadge) {
-            shouldHide = true;
-        }
-
-        // "Members only" for related videos
-        // only when the commerce badge contains an icon. Fundraiser badges
-        // usually contain only text (no `.yt-badge-shape__icon`), so this shoud be
-        // language-independent and avoids hiding fundraisers.
-        const relatedMembersBadgeIcon = item.querySelector('.yt-badge-shape--commerce .yt-badge-shape__icon');
-        if (relatedMembersBadgeIcon) {
-            shouldHide = true;
-        }
-
-        if (shouldHide) {
-            // Determine the best element to hide to avoid leaving empty slots in grids.
-            // Keep existing behavior, but handle home rich-grid case where yt-lockup-view-model
-            // is nested inside ytd-rich-item-renderer which reserves layout space.
-            let target: HTMLElement;
-
-            if (item.tagName.toLowerCase() === 'yt-lockup-view-model') {
-                const richItemRenderer = item.closest('ytd-rich-item-renderer') as HTMLElement | null;
-                target = richItemRenderer ?? (item as HTMLElement);
-            } else {
-                // For grid videos, hide the parent grid item to avoid breaking layout
-                const parentItem = item.closest('ytd-rich-item-renderer');
-                target = parentItem ? (parentItem as HTMLElement) : (item as HTMLElement);
-            }
+        if (container) {
+            // If the video is inside a grid slot (rich-item), hide the slot 
+            // to prevent leaving empty gaps in the home/channel layout.
+            const gridSlot = container.closest('ytd-rich-item-renderer') as HTMLElement | null;
+            const target = gridSlot || container;
 
             if (target.style.display !== 'none') {
                 target.style.display = 'none';
