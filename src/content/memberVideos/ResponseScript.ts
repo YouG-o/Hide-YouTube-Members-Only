@@ -18,8 +18,8 @@ const fetchEndpoints = [
 // Counter for removed sponsorship videos in the current fetch response
 let removedCount = 0;
 
-// Helper function to detect sponsorship badge
-function isSponsorshipVideo(videoRenderer: any): boolean {
+// --- Legacy format: videoRenderer with badges[].metadataBadgeRenderer.icon.iconType ---
+function isSponsorshipVideoRenderer(videoRenderer: any): boolean {
     if (!videoRenderer || !Array.isArray(videoRenderer.badges)) return false;
     return videoRenderer.badges.some((badge: any) =>
         badge.metadataBadgeRenderer &&
@@ -28,12 +28,35 @@ function isSponsorshipVideo(videoRenderer: any): boolean {
     );
 }
 
-// Helper function to get video title
-function getVideoTitle(videoRenderer: any): string {
+function getVideoTitleFromRenderer(videoRenderer: any): string {
     if (videoRenderer && videoRenderer.title && videoRenderer.title.runs && videoRenderer.title.runs[0]) {
         return videoRenderer.title.runs[0].text;
     }
     return '[Unknown Title]';
+}
+
+// --- New format: lockupViewModel with metadataRows[].badges[].badgeViewModel ---
+function isSponsorshipLockup(lockupViewModel: any): boolean {
+    const metadataRows =
+        lockupViewModel?.metadata?.lockupMetadataViewModel?.metadata?.contentMetadataViewModel?.metadataRows;
+
+    if (!Array.isArray(metadataRows)) return false;
+
+    return metadataRows.some((row: any) =>
+        Array.isArray(row?.badges) &&
+        row.badges.some((badge: any) =>
+            badge.badgeViewModel &&
+            (
+                badge.badgeViewModel.iconName === 'SPONSORSHIP_STAR' ||
+                badge.badgeViewModel.badgeStyle === 'BADGE_MEMBERS_ONLY'
+            )
+        )
+    );
+}
+
+function getVideoTitleFromLockup(lockupViewModel: any): string {
+    const titleContent = lockupViewModel?.metadata?.lockupMetadataViewModel?.title?.content;
+    return titleContent || '[Unknown Title]';
 }
 
 // Recursive filter function: remove richItemRenderer containing sponsorship video
@@ -45,25 +68,35 @@ function filterSponsorshipVideos(obj: any): any {
         for (const item of obj) {
             let remove = false;
 
-            // Check for richItemRenderer > content > videoRenderer
-            if (
-                item &&
-                item.richItemRenderer &&
-                item.richItemRenderer.content &&
-                item.richItemRenderer.content.videoRenderer &&
-                isSponsorshipVideo(item.richItemRenderer.content.videoRenderer)
-            ) {
-                const videoRenderer = item.richItemRenderer.content.videoRenderer;
-                const title = getVideoTitle(videoRenderer);
+            const content = item?.richItemRenderer?.content;
+
+            // New format: richItemRenderer > content > lockupViewModel
+            if (content?.lockupViewModel && isSponsorshipLockup(content.lockupViewModel)) {
+                const title = getVideoTitleFromLockup(content.lockupViewModel);
                 //memberVideosLog(`Removed members-only video: "%c${title}%c"`, 'color: white;', '');
                 removedCount++;
                 remove = true;
             }
 
-            // Check for direct videoRenderer (for other layouts)
-            if (!remove && item && item.videoRenderer && isSponsorshipVideo(item.videoRenderer)) {
-                const videoRenderer = item.videoRenderer;
-                const title = getVideoTitle(videoRenderer);
+            // Legacy format: richItemRenderer > content > videoRenderer
+            if (!remove && content?.videoRenderer && isSponsorshipVideoRenderer(content.videoRenderer)) {
+                const title = getVideoTitleFromRenderer(content.videoRenderer);
+                //memberVideosLog(`Removed members-only video: "%c${title}%c"`, 'color: white;', '');
+                removedCount++;
+                remove = true;
+            }
+
+            // Legacy format: direct videoRenderer (other layouts)
+            if (!remove && item?.videoRenderer && isSponsorshipVideoRenderer(item.videoRenderer)) {
+                const title = getVideoTitleFromRenderer(item.videoRenderer);
+                //memberVideosLog(`Removed members-only video: "%c${title}%c"`, 'color: white;', '');
+                removedCount++;
+                remove = true;
+            }
+
+            // Direct lockupViewModel (other layouts, e.g. search results)
+            if (!remove && item?.lockupViewModel && isSponsorshipLockup(item.lockupViewModel)) {
+                const title = getVideoTitleFromLockup(item.lockupViewModel);
                 //memberVideosLog(`Removed members-only video: "%c${title}%c"`, 'color: white;', '');
                 removedCount++;
                 remove = true;
